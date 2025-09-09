@@ -4,6 +4,8 @@ import com.dx.demo0.entity.MessageForDirectExchange;
 import com.dx.demo0.entity.MessageForFanoutExchange;
 import com.dx.demo0.entity.MessageForTopicExchange;
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.AsyncRabbitTemplate;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -107,5 +109,10 @@ public class RabbitMQConfig {
             return BindingBuilder.bind(queueB()).to(exchange2());
         }
 
+    }
+
+    @Bean
+    public AsyncRabbitTemplate asyncRabbitTemplate(RabbitTemplate rabbitTemplate) {
+        return new AsyncRabbitTemplate(rabbitTemplate);
     }
 }
