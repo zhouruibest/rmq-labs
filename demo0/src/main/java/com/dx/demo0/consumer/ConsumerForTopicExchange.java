@@ -15,7 +15,7 @@ import com.rabbitmq.client.Channel;
 
 
 @Component
-@RabbitListener(queues = MessageForTopicExchange.QUEUE_NAME)
+
 public class ConsumerForTopicExchange {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
@@ -23,7 +23,7 @@ public class ConsumerForTopicExchange {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    @RabbitHandler
+    @RabbitListener(queues = MessageForTopicExchange.QUEUE_NAME)
     public void onMessage(MessageForTopicExchange message, Channel channel, Message amqpMessage) {
         logger.info("[onMessage][线程编号:{} 消息内容：{}], start", Thread.currentThread().getId(), message);
         try {

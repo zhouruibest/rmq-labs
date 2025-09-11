@@ -9,12 +9,11 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 @Component
-@RabbitListener(queues = MessageForFanoutExchange.QUEUE_NAMEA)
 public class ConsumerAForFanoutExchange {
     private Logger logger = LoggerFactory.getLogger(ConsumerAForFanoutExchange.class);
 
-    @RabbitHandler
+    @RabbitListener(queues = MessageForFanoutExchange.QUEUE_NAMEA)
     public void onMessage(MessageForFanoutExchange message) {
-        logger.info("接收到消息: " + message);
+        logger.info("AAAAA 接收到消息: " + message);
     }
 }

@@ -1,19 +1,17 @@
 package com.dx.demo0.producer;
 
 import com.dx.demo0.entity.MessageForTopicExchange;
+import lombok.AllArgsConstructor;
 import org.springframework.amqp.rabbit.AsyncRabbitTemplate;
 import org.springframework.amqp.rabbit.RabbitFuture;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@AllArgsConstructor
 public class ProducerForTopicExchange {
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
-
-    @Autowired
-    private AsyncRabbitTemplate asyncRabbitTemplate;
+    private final RabbitTemplate rabbitTemplate;
+    private final AsyncRabbitTemplate asyncRabbitTemplate;
 
     public void syncSend(String msg) {
         var message = new MessageForTopicExchange();

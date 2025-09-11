@@ -1,17 +1,18 @@
 package com.dx.demo0.producer;
 
 import com.dx.demo0.entity.MessageForDirectExchange;
+import lombok.AllArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
 
 @Component
+@AllArgsConstructor
 public class ProducerForDirectExchange {
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
+
+    private final RabbitTemplate rabbitTemplate;
 
     public void syncSend(String msg) {
         var message = new MessageForDirectExchange();

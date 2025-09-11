@@ -5,12 +5,57 @@ import com.dx.demo0.entity.MessageForFanoutExchange;
 import com.dx.demo0.entity.MessageForTopicExchange;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.AsyncRabbitTemplate;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitMQConfig {
+    // 配置Jackson消息转换器
+    @Bean
+    public MessageConverter jsonMessageConverter() {
+        return new Jackson2JsonMessageConverter();
+    }
+
+    // 配置RabbitTemplate并设置消息转换器
+    @Bean
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+        RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+        // 设置消息转换器
+        rabbitTemplate.setMessageConverter(jsonMessageConverter());
+
+        // 可选：配置确认回调和返回回调
+        rabbitTemplate.setConfirmCallback((correlationData, ack, cause) -> {
+            if (ack) {
+                System.out.println("消息已成功到达交换机: " + (correlationData != null ? correlationData.getId() : "未知ID"));
+            } else {
+                System.err.println("消息到达交换机失败，原因: " + cause);
+            }
+        });
+
+        rabbitTemplate.setReturnsCallback(returnedMessage -> {
+            System.err.println("消息路由失败: " +
+                    "交换机=" + returnedMessage.getExchange() +
+                    ", 路由键=" + returnedMessage.getRoutingKey() +
+                    ", 消息=" + returnedMessage.getMessage() +
+                    ", 原因=" + returnedMessage.getReplyText());
+        });
+
+        return rabbitTemplate;
+    }
+
+    // 配置AsyncRabbitTemplate并设置消息转换器
+    @Bean
+    public AsyncRabbitTemplate asyncRabbitTemplate(RabbitTemplate rabbitTemplate) {
+        // AsyncRabbitTemplate基于已配置好的RabbitTemplate构建
+        // 会自动使用RabbitTemplate中设置的消息转换器
+        AsyncRabbitTemplate asyncTemplate = new AsyncRabbitTemplate(rabbitTemplate);
+        return asyncTemplate;
+    }
+
     /*
     每一类Exchange的演示都通过单独的配置类来声明
     Tips：1. 配置类及其内部静态类中的@Bean注解，都可以被Spring Boot扫描到
@@ -108,11 +153,5 @@ public class RabbitMQConfig {
         public Binding bindingB() {
             return BindingBuilder.bind(queueB()).to(exchange2());
         }
-
-    }
-
-    @Bean
-    public AsyncRabbitTemplate asyncRabbitTemplate(RabbitTemplate rabbitTemplate) {
-        return new AsyncRabbitTemplate(rabbitTemplate);
     }
 }
