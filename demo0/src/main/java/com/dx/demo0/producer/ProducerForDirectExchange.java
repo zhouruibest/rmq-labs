@@ -29,16 +29,16 @@ public class ProducerForDirectExchange {
         message.setMessage(msg);
         // 同步发送消息, 使用默认交换机.默认的交换机连接了每一个队列并使用队列名作为路由键
         rabbitTemplate.convertAndSend(
-                MessageForDirectExchange.ROUTING_KEY, // routingKey
+                MessageForDirectExchange.QUEUE_NAME, // routingKey
                 message); // message
     }
 
     @Async
-    public ListenableFuture<Void> asyncSend() {
+    public ListenableFuture<Void> asyncSend(String msg) {
         try {
             // 发送消息
-            this.syncSend("这是一条direct exchange的消息");
-            this.syncSendDefault("这是一条direct exchange的消息, 使用默认交换机和路由键");
+            this.syncSend(msg);
+            this.syncSendDefault(msg + ", 使用默认交换机和路由键");
             // 返回成功的 Future
             return AsyncResult.forValue(null);
         } catch (Throwable ex) {

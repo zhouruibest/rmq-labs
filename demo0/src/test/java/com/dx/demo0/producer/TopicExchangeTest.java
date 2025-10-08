@@ -4,6 +4,7 @@ import com.dx.demo0.Demo0Application;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.RabbitFuture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.concurrent.ListenableFutureCallback;
@@ -29,16 +30,24 @@ public class TopicExchangeTest {
 
     @Test
     public void testAsyncSend() throws InterruptedException {
-        int id = (int) (System.currentTimeMillis() / 1000);
-        producer.asyncSend("777777").whenComplete((result, throwable) -> {
+        // 创建唯一的correlationId，它通常作为消息的一部分
+        String correlationId = String.valueOf(System.currentTimeMillis() / 1000);
+
+        // 发送消息并获取future对象
+        RabbitFuture<Object> future = producer.asyncSend("777777", correlationId);
+
+
+        // 使用正确的correlationId进行日志记录
+        future.whenComplete((result, throwable) -> {
             if (throwable != null) {
-                logger.error("对象消息发送异常[correlationId: " + id + "]：" + throwable.getMessage() + "%n" );
+                logger.error("对象消息发送异常[correlationId: " + correlationId + "]：" + throwable.getMessage());
             } else {
-                logger.info("对象消息发送操作完成[correlationId: " + id + "]" + result.getClass() +  "%n");
+                logger.info("对象消息发送操作完成[correlationId: " + correlationId + "]");
             }
         });
 
         // 阻塞等待，保证消费
         new CountDownLatch(1).await();
     }
+
 }

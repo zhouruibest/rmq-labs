@@ -30,7 +30,7 @@ public class DirectExchangeTest {
     @Test
     public void testAsyncSend() throws InterruptedException {
         int id = (int) (System.currentTimeMillis() / 1000);
-        producer.asyncSend().addCallback(new ListenableFutureCallback<Void>() {
+        producer.asyncSend("这是一条direct exchange的消息").addCallback(new ListenableFutureCallback<Void>() {
 
             @Override
             public void onFailure(Throwable e) {
@@ -39,7 +39,7 @@ public class DirectExchangeTest {
 
             @Override
             public void onSuccess(Void aVoid) {
-                logger.info("[testASyncSend][发送编号：[{}] 发送成功，发送成功]", id);
+                logger.info("[testASyncSend][发送编号：[{}] 发送成功]", id);
             }
 
         });

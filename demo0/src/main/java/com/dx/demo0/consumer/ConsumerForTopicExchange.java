@@ -29,13 +29,13 @@ public class ConsumerForTopicExchange {
         try {
             Thread.sleep(1000);
             String replyContent = "消费成功" + message.getMessage();
-            String reployTo = amqpMessage.getMessageProperties().getReplyTo();
+            String replyTo = amqpMessage.getMessageProperties().getReplyTo();
             String correlationId = amqpMessage.getMessageProperties().getCorrelationId();
-            if (reployTo != null && correlationId != null) {
-                logger.info("[onMessage][线程编号:{} 消息内容：{}], 准备回复消息：{}",
-                        Thread.currentThread().getId(), message, replyContent);
+            if (replyTo != null && correlationId != null) {
+                logger.info("[onMessage][线程编号:{} 消息内容：{}], 准备回复消息：{}, correlationId {}",
+                        Thread.currentThread().getId(), message, replyContent, correlationId);
                 rabbitTemplate.convertAndSend(
-                        reployTo, // routingKey
+                        replyTo, // routingKey
                         replyContent, // message
                         msg -> { // postProcessMessage
                             msg.getMessageProperties().setCorrelationId(correlationId);
